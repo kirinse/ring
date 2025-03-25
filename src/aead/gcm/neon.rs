@@ -50,6 +50,14 @@ impl UpdateBlock for Key {
 
 impl UpdateBlocks for Key {
     fn update_blocks(&self, xi: &mut Xi, input: AsChunks<u8, BLOCK_LEN>) {
-        unsafe { ghash!(gcm_ghash_neon, xi, &self.h_table, input) }
+        prefixed_extern! {
+            fn gcm_ghash_neon(
+                xi: &mut Xi,
+                Htable: &HTable,
+                inp: *const u8,
+                len: crate::c::NonZero_size_t,
+            );
+        }
+        unsafe { self.h_table.ghash(gcm_ghash_neon, xi, input) }
     }
 }

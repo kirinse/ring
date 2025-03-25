@@ -43,7 +43,16 @@ impl Key {
 
 impl UpdateBlock for Key {
     fn update_block(&self, xi: &mut Xi, a: [u8; BLOCK_LEN]) {
+        prefixed_extern! {
+            fn gcm_ghash_vpclmulqdq_avx2_16(
+                xi: &mut Xi,
+                Htable: &HTable,
+                inp: *const u8,
+                len: crate::c::NonZero_size_t,
+            );
+        }
         let input: AsChunks<u8, BLOCK_LEN> = (&a).into();
-        unsafe { ghash!(gcm_ghash_vpclmulqdq_avx2_16, xi, &self.h_table, input) }
+        let htable = self.inner();
+        unsafe { htable.ghash(gcm_ghash_vpclmulqdq_avx2_16, xi, input) }
     }
 }
