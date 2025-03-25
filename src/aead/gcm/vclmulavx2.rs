@@ -14,12 +14,18 @@
 
 #![cfg(target_arch = "x86_64")]
 
-use super::{ffi::KeyValue, HTable, UpdateBlock, Xi};
+use super::{
+    ffi::{self, KeyValue},
+    UpdateBlock, Xi,
+};
 use crate::{
     aead::gcm::ffi::BLOCK_LEN,
     cpu::intel::{Avx2, VAesClmul},
     polyfill::slice::AsChunks,
 };
+
+#[cfg(target_arch = "x86_64")]
+pub(in super::super) type HTable = ffi::HTable<12>;
 
 #[derive(Clone)]
 pub struct Key {

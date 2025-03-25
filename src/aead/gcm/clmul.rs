@@ -18,7 +18,10 @@
     target_arch = "x86_64"
 ))]
 
-use super::{ffi::KeyValue, HTable, UpdateBlock, Xi};
+use super::{
+    ffi::{self, KeyValue},
+    UpdateBlock, Xi,
+};
 use crate::aead::gcm::ffi::BLOCK_LEN;
 use crate::cpu;
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
@@ -29,6 +32,15 @@ pub(in super::super) type RequiredCpuFeatures = cpu::arm::PMull;
 
 #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
 pub(in super::super) type RequiredCpuFeatures = (cpu::intel::ClMul, cpu::intel::Ssse3);
+
+#[cfg(all(target_arch = "aarch64", target_endian = "little"))]
+pub(in super::super) type HTable = ffi::HTable<6>;
+
+#[cfg(target_arch = "x86")]
+pub(in super::super) type HTable = ffi::HTable<3>;
+
+#[cfg(target_arch = "x86_64")]
+pub(in super::super) type HTable = ffi::HTable<6>;
 
 #[derive(Clone)]
 pub struct Key {

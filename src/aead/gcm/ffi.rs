@@ -43,13 +43,13 @@ impl KeyValue {
     target_arch = "x86",
     target_arch = "x86_64"
 ))]
-impl HTable {
+impl<const LEN: usize> HTable<LEN> {
     pub(super) unsafe fn new(
-        init: unsafe extern "C" fn(HTable: *mut HTable, &[u64; 2]),
+        init: unsafe extern "C" fn(HTable: *mut Self, &[u64; 2]),
         value: KeyValue,
     ) -> Self {
         let mut r = Self {
-            Htable: [U128 { hi: 0, lo: 0 }; HTABLE_LEN],
+            Htable: [U128 { hi: 0, lo: 0 }; 16],
         };
         unsafe { init(&mut r, &value.0) };
         r
@@ -61,7 +61,7 @@ impl HTable {
     ))]
     pub(super) unsafe fn gmult(
         &self,
-        f: unsafe extern "C" fn(xi: &mut Xi, h_table: &HTable),
+        f: unsafe extern "C" fn(xi: &mut Xi, h_table: &Self),
         xi: &mut Xi,
     ) {
         unsafe { f(xi, self) }
@@ -71,7 +71,7 @@ impl HTable {
         &self,
         f: unsafe extern "C" fn(
             xi: &mut Xi,
-            Htable: &HTable,
+            Htable: &Self,
             inp: *const u8,
             len: crate::c::NonZero_size_t,
         ),
@@ -101,8 +101,8 @@ impl HTable {
 // The alignment is required by some assembly code, such as `ghash-ssse3-*`.
 #[derive(Clone)]
 #[repr(C, align(16))]
-pub(in super::super) struct HTable {
-    Htable: [U128; HTABLE_LEN],
+pub(in super::super) struct HTable<const LEN: usize> {
+    Htable: [U128; 16],
 }
 
 #[derive(Clone, Copy)]
@@ -111,8 +111,6 @@ pub(super) struct U128 {
     pub(super) hi: u64,
     pub(super) lo: u64,
 }
-
-const HTABLE_LEN: usize = 16;
 
 #[repr(transparent)]
 pub(in super::super) struct Xi(pub(super) Block);

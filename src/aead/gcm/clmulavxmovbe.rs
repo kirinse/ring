@@ -14,8 +14,11 @@
 
 #![cfg(target_arch = "x86_64")]
 
-use super::{HTable, KeyValue, UpdateBlock, UpdateBlocks, Xi, BLOCK_LEN};
+use super::{ffi, KeyValue, UpdateBlock, UpdateBlocks, Xi, BLOCK_LEN};
 use crate::{cpu::intel, polyfill::slice::AsChunks};
+
+#[cfg(target_arch = "x86_64")]
+pub(in super::super) type HTable = ffi::HTable<12>;
 
 #[derive(Clone)]
 pub struct Key {

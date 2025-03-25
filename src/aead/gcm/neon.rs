@@ -17,10 +17,16 @@
     all(target_arch = "arm", target_endian = "little")
 ))]
 
-use super::{HTable, KeyValue, UpdateBlock, UpdateBlocks, Xi, BLOCK_LEN};
+use super::{ffi, KeyValue, UpdateBlock, UpdateBlocks, Xi, BLOCK_LEN};
 use crate::{cpu, polyfill::slice::AsChunks};
 
 pub(in super::super) type RequiredCpuFeatures = cpu::arm::Neon;
+
+#[cfg(any(
+    all(target_arch = "aarch64", target_endian = "little"),
+    all(target_arch = "arm", target_endian = "little")
+))]
+type HTable = ffi::HTable<1>;
 
 #[derive(Clone)]
 pub struct Key {
