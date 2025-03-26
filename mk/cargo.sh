@@ -293,7 +293,7 @@ if [ -n "${use_clang}" ]; then
   declare -x "${ar_var}=llvm-ar-${llvm_version}"
 fi
 
-cargo "$@"
+RUST_BACKTRACE=full cargo "$@"
 
 if [ -n "${RING_COVERAGE-}" ]; then
   # Keep in sync with check-symbol-prefixes.sh.
