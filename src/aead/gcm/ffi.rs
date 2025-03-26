@@ -49,7 +49,7 @@ impl<const LEN: usize> HTable<LEN> {
         value: KeyValue,
     ) -> Self {
         let mut r = Self {
-            Htable: [U128 { hi: 0, lo: 0 }; 16],
+            Htable: [U128 { hi: 0, lo: 0 }; LEN],
         };
         unsafe { init(&mut r, &value.0) };
         r
@@ -102,7 +102,7 @@ impl<const LEN: usize> HTable<LEN> {
 #[derive(Clone)]
 #[repr(C, align(16))]
 pub(in super::super) struct HTable<const LEN: usize> {
-    Htable: [U128; 16],
+    Htable: [U128; LEN],
 }
 
 #[derive(Clone, Copy)]
